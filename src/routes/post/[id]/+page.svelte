@@ -7,7 +7,6 @@
 {#if !post}
 	Fuck hou
 {:else}
-	<div class="header"><h1>Blog Wars</h1></div>
 	<div class="container">
 		<div class="post">
 			<h2>{post.username}#{post.id}</h2>
@@ -35,13 +34,6 @@
 {/if}
 
 <style>
-	.header {
-		background-color: #333;
-		color: white;
-		text-align: center;
-		padding: 10px;
-	}
-
 	.container {
 		display: flex;
 	}
