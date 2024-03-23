@@ -1,5 +1,4 @@
-import { fail, type RequestEvent } from '@sveltejs/kit';
-
+import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -48,6 +47,6 @@ export const actions = {
 		console.log({ response }); // TODO: if response 201, success: true
 		// TODO: if response fails, return fail(400, { email, incorrect: true });
 
-		return { success: true };
+		throw redirect(201, '/');
 	}
 };
