@@ -46,13 +46,6 @@ export const actions = {
 	default: async ({ cookies, fetch, request, params: { id } }: RequestEvent) => {
 		const data = await request.formData();
 		const content = data.get('comment-content');
-		cookies.delete('AuthorizationToken', {
-			httpOnly: true, // The httpOnly  option is set to  true  to prevent the cookie from being accessed by JavaScript. This is a good practice to prevent XSS attacks.
-			path: '/',
-			secure: true,
-			sameSite: 'strict'
-		});
-
 		const jwtToken = cookies.get('AuthorizationToken');
 		// TODO: add something if no jwtToken ?
 
