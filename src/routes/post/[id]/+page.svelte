@@ -5,7 +5,9 @@
 </script>
 
 {#if !post}
-	Fuck hou
+	<div class="container">Something went wrong...</div>
+{:else if 'statusCode' in post} <!-- typeof RequestError -->
+	<div class="container">{post.message} - {post.statusCode}</div>
 {:else}
 	<div class="container">
 		<div class="post">
@@ -28,7 +30,8 @@
 		{/each}
 
 		<form method="POST" class="input-container">
-			<input name="comment-content" type="text" placeholder="Write your comment..." /> <button>Post Comment</button>
+			<input name="comment-content" type="text" placeholder="Write your comment..." />
+			<button>Post Comment</button>
 		</form>
 	</div>
 {/if}

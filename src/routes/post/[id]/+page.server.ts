@@ -1,4 +1,9 @@
-import { type LoadEvent, type RequestEvent } from '@sveltejs/kit';
+import { fail, type LoadEvent, type RequestEvent } from '@sveltejs/kit';
+
+type RequestError = {
+	statusCode: number;
+	message: string;
+};
 
 type Post = {
 	id: number;
@@ -15,29 +20,24 @@ type Comment = {
 };
 
 type PostDetails = {
-	post: Post;
+	post: Post | RequestError;
 	comments: Comment[];
 };
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ fetch, params: { id } }: LoadEvent) {
 	try {
-		// TODO: rename this better, perhaps consider using axios so you don't need to await res.json()
-		const [postRes, commentaries] = await Promise.all([
+		const [postResponse, commentsResponse] = await Promise.all([
 			fetch(`http://localhost:8080/blogPost/${id}`),
 			fetch(`http://localhost:8080/comment?blogPostId=${id}`)
 		]);
 
-		/**
-		 * TODO: .json() returns object with message and statusCode (error) if request fails. How should we handle this ?
-		 * solution: .json() should be type Post or Error, make verification in UI if object.statusCode, render object.message
-		 */
-		// console.log({inting: await postRes.json()})
-		// console.log({inting: await commentaries.json()})
-
-		return { post: await postRes.json(), comments: await commentaries.json() } as PostDetails;
+		return {
+			post: await postResponse.json(),
+			comments: await commentsResponse.json()
+		} as PostDetails;
 	} catch (e) {
-		console.log({ e });
+		console.error(e);
 	}
 }
 
@@ -47,7 +47,6 @@ export const actions = {
 		const data = await request.formData();
 		const content = data.get('comment-content');
 		const jwtToken = cookies.get('AuthorizationToken');
-		// TODO: add something if no jwtToken ?
 
 		const body = JSON.stringify({
 			content,
@@ -63,8 +62,9 @@ export const actions = {
 			body
 		});
 
-		console.log({ response }); // TODO: if response 201, success: true
-		// TODO: if response fails, return fail(400, { email, incorrect: true });
+		if (response.status >= 400) {
+			return fail(response.status);
+		}
 
 		return { success: true };
 	}

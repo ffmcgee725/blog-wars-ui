@@ -1,4 +1,4 @@
-import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
+import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
@@ -36,17 +36,22 @@ export const actions = {
 			passwordVerification
 		});
 
-		const response = await fetch('http://localhost:8080/auth/register', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body
-		});
+		try {
+			const response = await fetch('http://localhost:8080/auth/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body
+			});
 
-		console.log({ response }); // TODO: if response 201, success: true
-		// TODO: if response fails, return fail(400, { email, incorrect: true });
+			if (response.status >= 400) {
+				return error(response.status, { message: response.statusText });
+			}
 
-		throw redirect(201, '/');
+			throw redirect(302, '/login');
+		} catch (e) {
+			console.error(e);
+		}
 	}
 };
